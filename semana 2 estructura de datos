@@ -1,0 +1,117 @@
+using System;
+
+namespace FigurasGeometricas
+{
+    /// <summary>
+    /// Clase que representa un círculo y sus operaciones básicas
+    /// </summary>
+    public class Circulo
+    {
+        // Atributo privado para almacenar el radio del círculo
+        private double radio;
+
+        // Constructor de la clase Circulo
+        public Circulo(double radio)
+        {
+            this.radio = radio;
+        }
+
+        // Propiedad para encapsular el acceso al radio
+        public double Radio
+        {
+            get { return radio; }
+            set { radio = value; }
+        }
+
+        /// <summary>
+        /// CalcularArea es un método que devuelve un valor double
+        /// Se utiliza para calcular el área del círculo usando la fórmula: π * r²
+        /// </summary>
+        /// <returns>Área del círculo</returns>
+        public double CalcularArea()
+        {
+            return Math.PI * radio * radio;
+        }
+
+        /// <summary>
+        /// CalcularPerimetro es un método que devuelve un valor double
+        /// Se utiliza para calcular el perímetro del círculo usando la fórmula: 2 * π * r
+        /// </summary>
+        /// <returns>Perímetro del círculo</returns>
+        public double CalcularPerimetro()
+        {
+            return 2 * Math.PI * radio;
+        }
+    }
+
+    /// <summary>
+    /// Clase que representa un rectángulo y sus operaciones básicas
+    /// </summary>
+    public class Rectangulo
+    {
+        // Atributos privados para almacenar la base y altura del rectángulo
+        private double baseRectangulo;
+        private double altura;
+
+        // Constructor de la clase Rectangulo
+        public Rectangulo(double baseRectangulo, double altura)
+        {
+            this.baseRectangulo = baseRectangulo;
+            this.altura = altura;
+        }
+
+        // Propiedades para encapsular el acceso a la base y altura
+        public double Base
+        {
+            get { return baseRectangulo; }
+            set { baseRectangulo = value; }
+        }
+
+        public double Altura
+        {
+            get { return altura; }
+            set { altura = value; }
+        }
+
+        /// <summary>
+        /// CalcularArea es un método que devuelve un valor double
+        /// Se utiliza para calcular el área del rectángulo usando la fórmula: base * altura
+        /// </summary>
+        /// <returns>Área del rectángulo</returns>
+        public double CalcularArea()
+        {
+            return baseRectangulo * altura;
+        }
+
+        /// <summary>
+        /// CalcularPerimetro es un método que devuelve un valor double
+        /// Se utiliza para calcular el perímetro del rectángulo usando la fórmula: 2 * (base + altura)
+        /// </summary>
+        /// <returns>Perímetro del rectángulo</returns>
+        public double CalcularPerimetro()
+        {
+            return 2 * (baseRectangulo + altura);
+        }
+    }
+
+    /// <summary>
+    /// Clase principal con ejemplo de uso de las clases
+    /// </summary>
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Ejemplo de uso del círculo
+            Circulo circulo = new Circulo(5);
+            Console.WriteLine($"Círculo con radio {circulo.Radio}:");
+            Console.WriteLine($"Área: {circulo.CalcularArea():F2}");
+            Console.WriteLine($"Perímetro: {circulo.CalcularPerimetro():F2}");
+
+            // Ejemplo de uso del rectángulo
+            Rectangulo rectangulo = new Rectangulo(4, 6);
+            Console.WriteLine($"\nRectángulo con base {rectangulo.Base} y altura {rectangulo.Altura}:");
+            Console.WriteLine($"Área: {rectangulo.CalcularArea():F2}");
+            Console.WriteLine($"Perímetro: {rectangulo.CalcularPerimetro():F2}");
+        }
+    }
+}
