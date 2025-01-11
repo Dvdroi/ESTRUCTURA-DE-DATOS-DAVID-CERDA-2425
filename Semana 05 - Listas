@@ -1,0 +1,84 @@
+Ejercicio1
+Escribir un programa que almacene las asignaturas de un curso (por ejemplo Matemáticas, Física, Química, Historia y Lengua) en una lista y la muestre por pantalla.
+
+asignaturas = ["Matemáticas", "Física", "Química", "Historia", "Lengua"]
+print(asignaturas)
+
+Ejercicio 2
+Escribir un programa que almacene las asignaturas de un curso (por ejemplo Matemáticas, Física, Química, Historia y Lengua) en una lista y la muestre por pantalla el mensaje Yo estudio <asignatura>, donde <asignatura> es cada una de las asignaturas de la lista.
+
+using System;
+using System.Collections.Generic;
+
+class Program {
+   static void Main() {
+       List<string> asignaturas = new List<string> { 
+           "Matemáticas", "Física", "Química", "Historia", "Lengua" 
+       };
+       
+       foreach(string asignatura in asignaturas) {
+           Console.WriteLine($"Yo estudio {asignatura}");
+       }
+   }
+}
+
+Ejercicio 3
+Escribir un programa que pregunte al usuario los números ganadores de la lotería primitiva, los almacene en una lista y los muestre por pantalla ordenados de menor a mayor.
+
+using System;
+using System.Collections.Generic;
+
+class Program {
+   static void Main() {
+       List<int> numerosGanadores = new List<int>();
+       Console.WriteLine("Introduce los 6 números ganadores de la lotería:");
+
+       for(int i = 0; i < 6; i++) {
+           Console.Write($"Número {i+1}: ");
+           int numero = Convert.ToInt32(Console.ReadLine());
+           numerosGanadores.Add(numero);
+       }
+
+       numerosGanadores.Sort();
+       Console.WriteLine("\nNúmeros ordenados:");
+       foreach(int numero in numerosGanadores) {
+           Console.Write($"{numero} ");
+       }
+   }
+}
+
+Ejericio 4
+Escribir un programa que almacene en una lista los números del 1 al 10 y los muestre por pantalla en orden inverso separados por comas.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program {
+   static void Main() {
+       List<int> numeros = Enumerable.Range(1, 10).ToList();
+       numeros.Reverse();
+       Console.WriteLine(string.Join(", ", numeros));
+   }
+}
+
+Ejercicio 5
+Escribir un programa que almacene el abecedario en una lista, elimine de la lista las letras que ocupen posiciones múltiplos de 3, y muestre por pantalla la lista resultante.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program {
+   static void Main() {
+       List<char> abecedario = Enumerable.Range('A', 26).Select(x => (char)x).ToList();
+       
+       for(int i = abecedario.Count - 1; i >= 0; i--) {
+           if((i + 1) % 3 == 0) {
+               abecedario.RemoveAt(i);
+           }
+       }
+
+       Console.WriteLine(string.Join(", ", abecedario));
+   }
+}
