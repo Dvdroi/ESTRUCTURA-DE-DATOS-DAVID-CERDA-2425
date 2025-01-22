@@ -1,0 +1,111 @@
+// Clase para representar cada nodo de la lista
+public class Nodo
+{
+    public int Dato { get; set; }
+    public Nodo Siguiente { get; set; }
+
+    public Nodo(int dato)
+    {
+        Dato = dato;
+        Siguiente = null;
+    }
+}
+
+// Clase para manejar la lista enlazada
+public class ListaEnlazada
+{
+    private Nodo cabeza;
+
+    public ListaEnlazada()
+    {
+        cabeza = null;
+    }
+
+    // Método para agregar elementos a la lista
+    public void AgregarElemento(int dato)
+    {
+        Nodo nuevoNodo = new Nodo(dato);
+        
+        if (cabeza == null)
+        {
+            cabeza = nuevoNodo;
+            return;
+        }
+
+        Nodo actual = cabeza;
+        while (actual.Siguiente != null)
+        {
+            actual = actual.Siguiente;
+        }
+        actual.Siguiente = nuevoNodo;
+    }
+
+    // Método para contar elementos de la lista
+    public int ContarElementos()
+    {
+        int contador = 0;
+        Nodo actual = cabeza;
+
+        while (actual != null)
+        {
+            contador++;
+            actual = actual.Siguiente;
+        }
+
+        return contador;
+    }
+
+    // Método para buscar un valor y contar sus ocurrencias
+    public void BuscarValor(int valorBuscado)
+    {
+        if (cabeza == null)
+        {
+            Console.WriteLine("La lista está vacía.");
+            return;
+        }
+
+        int ocurrencias = 0;
+        Nodo actual = cabeza;
+        int posicion = 1;
+
+        // Recorremos la lista buscando el valor
+        while (actual != null)
+        {
+            if (actual.Dato == valorBuscado)
+            {
+                ocurrencias++;
+                Console.WriteLine($"Valor {valorBuscado} encontrado en la posición {posicion}");
+            }
+            actual = actual.Siguiente;
+            posicion++;
+        }
+
+        // Mostramos el resultado de la búsqueda
+        if (ocurrencias > 0)
+        {
+            Console.WriteLine($"\nEl valor {valorBuscado} se encontró {ocurrencias} vez/veces en la lista.");
+        }
+        else
+        {
+            Console.WriteLine($"\nEl valor {valorBuscado} no fue encontrado en la lista.");
+        }
+    }
+
+    // Método para mostrar la lista
+    public void MostrarLista()
+    {
+        if (cabeza == null)
+        {
+            Console.WriteLine("La lista está vacía.");
+            return;
+        }
+
+        Nodo actual = cabeza;
+        while (actual != null)
+        {
+            Console.Write(actual.Dato + " -> ");
+            actual = actual.Siguiente;
+        }
+        Console.WriteLine("null");
+    }
+}
