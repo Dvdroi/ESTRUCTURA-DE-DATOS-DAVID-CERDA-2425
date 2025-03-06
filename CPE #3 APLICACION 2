@@ -1,0 +1,407 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace PremiacionDeportistas
+{
+    // Enumeración para las categorías de premiación
+    enum CategoriaPremio
+    {
+        Oro,
+        Plata,
+        Bronce,
+        MencionHonorifica,
+        MejorDeportista,
+        JuegoLimpio
+    }
+
+    // Enumeración para las disciplinas deportivas
+    enum Disciplina
+    {
+        Futbol,
+        Baloncesto,
+        Natacion,
+        Atletismo,
+        Tenis,
+        Voleibol,
+        Ciclismo,
+        Gimnasia
+    }
+
+    // Clase para representar a un deportista
+    class Deportista
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public int Edad { get; set; }
+        public string Pais { get; set; }
+        public Disciplina Disciplina { get; set; }
+        public List<Premio> Premios { get; set; }
+
+        public Deportista(int id, string nombre, string apellido, int edad, string pais, Disciplina disciplina)
+        {
+            Id = id;
+            Nombre = nombre;
+            Apellido = apellido;
+            Edad = edad;
+            Pais = pais;
+            Disciplina = disciplina;
+            Premios = new List<Premio>();
+        }
+
+        public void RecibirPremio(Premio premio)
+        {
+            Premios.Add(premio);
+            Console.WriteLine($"{Nombre} {Apellido} ha recibido un premio: {premio.Categoria} en {premio.Competencia}");
+        }
+
+        public override string ToString()
+        {
+            return $"ID: {Id}, Nombre: {Nombre} {Apellido}, Edad: {Edad}, País: {Pais}, Disciplina: {Disciplina}, Premios: {Premios.Count}";
+        }
+    }
+
+    // Clase para representar un premio
+    class Premio
+    {
+        public int Id { get; set; }
+        public string Competencia { get; set; }
+        public CategoriaPremio Categoria { get; set; }
+        public DateTime Fecha { get; set; }
+        public string Descripcion { get; set; }
+
+        public Premio(int id, string competencia, CategoriaPremio categoria, DateTime fecha, string descripcion)
+        {
+            Id = id;
+            Competencia = competencia;
+            Categoria = categoria;
+            Fecha = fecha;
+            Descripcion = descripcion;
+        }
+
+        public override string ToString()
+        {
+            return $"ID: {Id}, Competencia: {Competencia}, Categoría: {Categoria}, Fecha: {Fecha.ToShortDateString()}, Descripción: {Descripcion}";
+        }
+    }
+
+    // Clase para representar una ceremonia de premiación
+    class CeremoniaPremios
+    {
+        public string Nombre { get; set; }
+        public DateTime Fecha { get; set; }
+        public string Ubicacion { get; set; }
+        public List<Premio> PremiosOtorgados { get; set; }
+
+        public CeremoniaPremios(string nombre, DateTime fecha, string ubicacion)
+        {
+            Nombre = nombre;
+            Fecha = fecha;
+            Ubicacion = ubicacion;
+            PremiosOtorgados = new List<Premio>();
+        }
+
+        public void OtorgarPremio(Deportista deportista, Premio premio)
+        {
+            deportista.RecibirPremio(premio);
+            PremiosOtorgados.Add(premio);
+        }
+
+        public override string ToString()
+        {
+            return $"Ceremonia: {Nombre}, Fecha: {Fecha.ToShortDateString()}, Ubicación: {Ubicacion}, Premios Otorgados: {PremiosOtorgados.Count}";
+        }
+    }
+
+    class Program
+    {
+        static List<Deportista> deportistas = new List<Deportista>();
+        static List<Premio> premiosDisponibles = new List<Premio>();
+        static CeremoniaPremios ceremonia;
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("=== SISTEMA DE PREMIACIÓN DE DEPORTISTAS ===");
+            
+            // Crear una nueva ceremonia
+            Console.WriteLine("\nCreando una nueva ceremonia de premiación...");
+            Console.Write("Nombre de la ceremonia: ");
+            string nombreCeremonia = Console.ReadLine();
+            
+            Console.Write("Fecha (DD/MM/AAAA): ");
+            DateTime fechaCeremonia = DateTime.Parse(Console.ReadLine());
+            
+            Console.Write("Ubicación: ");
+            string ubicacionCeremonia = Console.ReadLine();
+            
+            ceremonia = new CeremoniaPremios(nombreCeremonia, fechaCeremonia, ubicacionCeremonia);
+            Console.WriteLine($"Ceremonia '{ceremonia.Nombre}' creada exitosamente");
+
+            // Menú principal
+            int opcion = 0;
+            do
+            {
+                Console.WriteLine("\n--- MENÚ PRINCIPAL ---");
+                Console.WriteLine("1. Registrar nuevo deportista");
+                Console.WriteLine("2. Crear nuevo premio");
+                Console.WriteLine("3. Otorgar premio a deportista");
+                Console.WriteLine("4. Ver deportistas registrados");
+                Console.WriteLine("5. Ver premios disponibles");
+                Console.WriteLine("6. Ver detalles de la ceremonia");
+                Console.WriteLine("7. Ver premios de un deportista");
+                Console.WriteLine("0. Salir");
+                Console.Write("Seleccione una opción: ");
+                
+                try
+                {
+                    opcion = int.Parse(Console.ReadLine());
+                    
+                    switch (opcion)
+                    {
+                        case 1:
+                            RegistrarDeportista();
+                            break;
+                        case 2:
+                            CrearPremio();
+                            break;
+                        case 3:
+                            OtorgarPremio();
+                            break;
+                        case 4:
+                            VerDeportistasRegistrados();
+                            break;
+                        case 5:
+                            VerPremiosDisponibles();
+                            break;
+                        case 6:
+                            VerDetallesCeremonia();
+                            break;
+                        case 7:
+                            VerPremiosDeportista();
+                            break;
+                        case 0:
+                            Console.WriteLine("Saliendo del programa...");
+                            break;
+                        default:
+                            Console.WriteLine("Opción no válida. Intente de nuevo.");
+                            break;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Ingrese un número válido.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+                
+            } while (opcion != 0);
+        }
+
+        // Métodos auxiliares para las operaciones del menú
+        static void RegistrarDeportista()
+        {
+            Console.WriteLine("\n-- REGISTRO DE NUEVO DEPORTISTA --");
+            
+            Console.Write("ID del deportista: ");
+            int id = int.Parse(Console.ReadLine());
+            
+            Console.Write("Nombre: ");
+            string nombre = Console.ReadLine();
+            
+            Console.Write("Apellido: ");
+            string apellido = Console.ReadLine();
+            
+            Console.Write("Edad: ");
+            int edad = int.Parse(Console.ReadLine());
+            
+            Console.Write("País: ");
+            string pais = Console.ReadLine();
+            
+            Console.WriteLine("Disciplinas disponibles:");
+            foreach (Disciplina disc in Enum.GetValues(typeof(Disciplina)))
+            {
+                Console.WriteLine($"{(int)disc}. {disc}");
+            }
+            
+            Console.Write("Seleccione la disciplina (número): ");
+            Disciplina disciplina = (Disciplina)int.Parse(Console.ReadLine());
+            
+            Deportista nuevoDeportista = new Deportista(id, nombre, apellido, edad, pais, disciplina);
+            deportistas.Add(nuevoDeportista);
+            
+            Console.WriteLine($"Deportista '{nombre} {apellido}' registrado exitosamente");
+        }
+
+        static void CrearPremio()
+        {
+            Console.WriteLine("\n-- CREACIÓN DE NUEVO PREMIO --");
+            
+            Console.Write("ID del premio: ");
+            int id = int.Parse(Console.ReadLine());
+            
+            Console.Write("Nombre de la competencia: ");
+            string competencia = Console.ReadLine();
+            
+            Console.WriteLine("Categorías de premio disponibles:");
+            foreach (CategoriaPremio cat in Enum.GetValues(typeof(CategoriaPremio)))
+            {
+                Console.WriteLine($"{(int)cat}. {cat}");
+            }
+            
+            Console.Write("Seleccione la categoría (número): ");
+            CategoriaPremio categoria = (CategoriaPremio)int.Parse(Console.ReadLine());
+            
+            Console.Write("Fecha (DD/MM/AAAA): ");
+            DateTime fecha = DateTime.Parse(Console.ReadLine());
+            
+            Console.Write("Descripción: ");
+            string descripcion = Console.ReadLine();
+            
+            Premio nuevoPremio = new Premio(id, competencia, categoria, fecha, descripcion);
+            premiosDisponibles.Add(nuevoPremio);
+            
+            Console.WriteLine($"Premio '{categoria}' para '{competencia}' creado exitosamente");
+        }
+
+        static void OtorgarPremio()
+        {
+            Console.WriteLine("\n-- OTORGAR PREMIO A DEPORTISTA --");
+            
+            if (deportistas.Count == 0)
+            {
+                Console.WriteLine("No hay deportistas registrados.");
+                return;
+            }
+            
+            if (premiosDisponibles.Count == 0)
+            {
+                Console.WriteLine("No hay premios disponibles.");
+                return;
+            }
+            
+            Console.WriteLine("Deportistas disponibles:");
+            for (int i = 0; i < deportistas.Count; i++)
+            {
+                Console.WriteLine($"{i+1}. {deportistas[i].Nombre} {deportistas[i].Apellido} - {deportistas[i].Disciplina}");
+            }
+            
+            Console.Write("Seleccione el número del deportista: ");
+            int indiceDeportista = int.Parse(Console.ReadLine()) - 1;
+            
+            if (indiceDeportista < 0 || indiceDeportista >= deportistas.Count)
+            {
+                Console.WriteLine("Selección inválida.");
+                return;
+            }
+            
+            Deportista deportistaSeleccionado = deportistas[indiceDeportista];
+            
+            Console.WriteLine("Premios disponibles:");
+            for (int i = 0; i < premiosDisponibles.Count; i++)
+            {
+                Console.WriteLine($"{i+1}. {premiosDisponibles[i].Categoria} - {premiosDisponibles[i].Competencia}");
+            }
+            
+            Console.Write("Seleccione el número del premio: ");
+            int indicePremio = int.Parse(Console.ReadLine()) - 1;
+            
+            if (indicePremio < 0 || indicePremio >= premiosDisponibles.Count)
+            {
+                Console.WriteLine("Selección inválida.");
+                return;
+            }
+            
+            Premio premioSeleccionado = premiosDisponibles[indicePremio];
+            
+            ceremonia.OtorgarPremio(deportistaSeleccionado, premioSeleccionado);
+            premiosDisponibles.RemoveAt(indicePremio);
+            
+            Console.WriteLine($"Premio otorgado exitosamente a {deportistaSeleccionado.Nombre} {deportistaSeleccionado.Apellido}");
+        }
+
+        static void VerDeportistasRegistrados()
+        {
+            Console.WriteLine("\n-- DEPORTISTAS REGISTRADOS --");
+            
+            if (deportistas.Count == 0)
+            {
+                Console.WriteLine("No hay deportistas registrados.");
+                return;
+            }
+            
+            foreach (var deportista in deportistas)
+            {
+                Console.WriteLine(deportista);
+            }
+        }
+
+        static void VerPremiosDisponibles()
+        {
+            Console.WriteLine("\n-- PREMIOS DISPONIBLES --");
+            
+            if (premiosDisponibles.Count == 0)
+            {
+                Console.WriteLine("No hay premios disponibles.");
+                return;
+            }
+            
+            foreach (var premio in premiosDisponibles)
+            {
+                Console.WriteLine(premio);
+            }
+        }
+
+        static void VerDetallesCeremonia()
+        {
+            Console.WriteLine("\n-- DETALLES DE LA CEREMONIA --");
+            Console.WriteLine(ceremonia);
+            Console.WriteLine($"Total de deportistas: {deportistas.Count}");
+            Console.WriteLine($"Total de premios otorgados: {ceremonia.PremiosOtorgados.Count}");
+            Console.WriteLine($"Total de premios disponibles: {premiosDisponibles.Count}");
+        }
+
+        static void VerPremiosDeportista()
+        {
+            Console.WriteLine("\n-- PREMIOS DE UN DEPORTISTA --");
+            
+            if (deportistas.Count == 0)
+            {
+                Console.WriteLine("No hay deportistas registrados.");
+                return;
+            }
+            
+            Console.WriteLine("Deportistas disponibles:");
+            for (int i = 0; i < deportistas.Count; i++)
+            {
+                Console.WriteLine($"{i+1}. {deportistas[i].Nombre} {deportistas[i].Apellido} - {deportistas[i].Disciplina}");
+            }
+            
+            Console.Write("Seleccione el número del deportista: ");
+            int indiceDeportista = int.Parse(Console.ReadLine()) - 1;
+            
+            if (indiceDeportista < 0 || indiceDeportista >= deportistas.Count)
+            {
+                Console.WriteLine("Selección inválida.");
+                return;
+            }
+            
+            Deportista deportistaSeleccionado = deportistas[indiceDeportista];
+            
+            Console.WriteLine($"\nPremios de {deportistaSeleccionado.Nombre} {deportistaSeleccionado.Apellido}:");
+            
+            if (deportistaSeleccionado.Premios.Count == 0)
+            {
+                Console.WriteLine("Este deportista no tiene premios.");
+                return;
+            }
+            
+            foreach (var premio in deportistaSeleccionado.Premios)
+            {
+                Console.WriteLine(premio);
+            }
+        }
+    }
+}
