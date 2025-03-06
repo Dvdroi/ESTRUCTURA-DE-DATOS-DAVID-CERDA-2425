@@ -1,0 +1,306 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace RegistroTorneoFutbol
+{
+    // Clase para representar un jugador
+    class Jugador
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public int Edad { get; set; }
+        public string Posicion { get; set; }
+        public int NumeroPlayera { get; set; }
+
+        public Jugador(int id, string nombre, string apellido, int edad, string posicion, int numeroPlayera)
+        {
+            Id = id;
+            Nombre = nombre;
+            Apellido = apellido;
+            Edad = edad;
+            Posicion = posicion;
+            NumeroPlayera = numeroPlayera;
+        }
+
+        public override string ToString()
+        {
+            return $"ID: {Id}, Nombre: {Nombre} {Apellido}, Edad: {Edad}, Posición: {Posicion}, Número: {NumeroPlayera}";
+        }
+    }
+
+    // Clase para representar un equipo
+    class Equipo
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string DirectorTecnico { get; set; }
+        public List<Jugador> Jugadores { get; set; }
+
+        public Equipo(int id, string nombre, string directorTecnico)
+        {
+            Id = id;
+            Nombre = nombre;
+            DirectorTecnico = directorTecnico;
+            Jugadores = new List<Jugador>();
+        }
+
+        public void AgregarJugador(Jugador jugador)
+        {
+            Jugadores.Add(jugador);
+        }
+
+        public override string ToString()
+        {
+            return $"ID: {Id}, Nombre: {Nombre}, Director Técnico: {DirectorTecnico}, Jugadores: {Jugadores.Count}";
+        }
+    }
+
+    // Clase para representar un torneo
+    class Torneo
+    {
+        public string Nombre { get; set; }
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
+        public List<Equipo> Equipos { get; set; }
+
+        public Torneo(string nombre, DateTime fechaInicio, DateTime fechaFin)
+        {
+            Nombre = nombre;
+            FechaInicio = fechaInicio;
+            FechaFin = fechaFin;
+            Equipos = new List<Equipo>();
+        }
+
+        public void RegistrarEquipo(Equipo equipo)
+        {
+            Equipos.Add(equipo);
+            Console.WriteLine($"Equipo '{equipo.Nombre}' registrado en el torneo '{Nombre}'");
+        }
+
+        public override string ToString()
+        {
+            return $"Torneo: {Nombre}, Fecha Inicio: {FechaInicio.ToShortDateString()}, Fecha Fin: {FechaFin.ToShortDateString()}, Equipos: {Equipos.Count}";
+        }
+    }
+
+    // Clase principal del programa
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("=== SISTEMA DE REGISTRO DE TORNEO DE FÚTBOL ===");
+            
+            // Crear un nuevo torneo
+            Console.WriteLine("\nCreando un nuevo torneo...");
+            Console.Write("Nombre del torneo: ");
+            string nombreTorneo = Console.ReadLine();
+            
+            Console.Write("Fecha de inicio (DD/MM/AAAA): ");
+            DateTime fechaInicio = DateTime.Parse(Console.ReadLine());
+            
+            Console.Write("Fecha de fin (DD/MM/AAAA): ");
+            DateTime fechaFin = DateTime.Parse(Console.ReadLine());
+            
+            Torneo torneo = new Torneo(nombreTorneo, fechaInicio, fechaFin);
+            Console.WriteLine($"Torneo '{torneo.Nombre}' creado exitosamente");
+
+            // Menú principal
+            int opcion = 0;
+            do
+            {
+                Console.WriteLine("\n--- MENÚ PRINCIPAL ---");
+                Console.WriteLine("1. Registrar nuevo equipo");
+                Console.WriteLine("2. Ver equipos registrados");
+                Console.WriteLine("3. Agregar jugador a un equipo");
+                Console.WriteLine("4. Ver jugadores de un equipo");
+                Console.WriteLine("5. Ver detalles del torneo");
+                Console.WriteLine("0. Salir");
+                Console.Write("Seleccione una opción: ");
+                
+                try
+                {
+                    opcion = int.Parse(Console.ReadLine());
+                    
+                    switch (opcion)
+                    {
+                        case 1:
+                            RegistrarEquipo(torneo);
+                            break;
+                        case 2:
+                            VerEquiposRegistrados(torneo);
+                            break;
+                        case 3:
+                            AgregarJugadorAEquipo(torneo);
+                            break;
+                        case 4:
+                            VerJugadoresDeEquipo(torneo);
+                            break;
+                        case 5:
+                            VerDetallesDeTorneo(torneo);
+                            break;
+                        case 0:
+                            Console.WriteLine("Saliendo del programa...");
+                            break;
+                        default:
+                            Console.WriteLine("Opción no válida. Intente de nuevo.");
+                            break;
+                    }
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Ingrese un número válido.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error: {ex.Message}");
+                }
+                
+            } while (opcion != 0);
+        }
+
+        // Métodos auxiliares para las operaciones del menú
+        static void RegistrarEquipo(Torneo torneo)
+        {
+            Console.WriteLine("\n-- REGISTRO DE NUEVO EQUIPO --");
+            
+            Console.Write("ID del equipo: ");
+            int id = int.Parse(Console.ReadLine());
+            
+            Console.Write("Nombre del equipo: ");
+            string nombre = Console.ReadLine();
+            
+            Console.Write("Director técnico: ");
+            string directorTecnico = Console.ReadLine();
+            
+            Equipo nuevoEquipo = new Equipo(id, nombre, directorTecnico);
+            torneo.RegistrarEquipo(nuevoEquipo);
+        }
+
+        static void VerEquiposRegistrados(Torneo torneo)
+        {
+            Console.WriteLine("\n-- EQUIPOS REGISTRADOS --");
+            
+            if (torneo.Equipos.Count == 0)
+            {
+                Console.WriteLine("No hay equipos registrados en el torneo.");
+                return;
+            }
+            
+            foreach (var equipo in torneo.Equipos)
+            {
+                Console.WriteLine(equipo);
+            }
+        }
+
+        static void AgregarJugadorAEquipo(Torneo torneo)
+        {
+            Console.WriteLine("\n-- AGREGAR JUGADOR A EQUIPO --");
+            
+            if (torneo.Equipos.Count == 0)
+            {
+                Console.WriteLine("No hay equipos registrados en el torneo.");
+                return;
+            }
+            
+            Console.WriteLine("Equipos disponibles:");
+            for (int i = 0; i < torneo.Equipos.Count; i++)
+            {
+                Console.WriteLine($"{i+1}. {torneo.Equipos[i].Nombre}");
+            }
+            
+            Console.Write("Seleccione el número del equipo: ");
+            int indiceEquipo = int.Parse(Console.ReadLine()) - 1;
+            
+            if (indiceEquipo < 0 || indiceEquipo >= torneo.Equipos.Count)
+            {
+                Console.WriteLine("Selección inválida.");
+                return;
+            }
+            
+            Equipo equipoSeleccionado = torneo.Equipos[indiceEquipo];
+            
+            Console.WriteLine($"Agregando jugador al equipo: {equipoSeleccionado.Nombre}");
+            
+            Console.Write("ID del jugador: ");
+            int id = int.Parse(Console.ReadLine());
+            
+            Console.Write("Nombre: ");
+            string nombre = Console.ReadLine();
+            
+            Console.Write("Apellido: ");
+            string apellido = Console.ReadLine();
+            
+            Console.Write("Edad: ");
+            int edad = int.Parse(Console.ReadLine());
+            
+            Console.Write("Posición: ");
+            string posicion = Console.ReadLine();
+            
+            Console.Write("Número de playera: ");
+            int numeroPlayera = int.Parse(Console.ReadLine());
+            
+            Jugador nuevoJugador = new Jugador(id, nombre, apellido, edad, posicion, numeroPlayera);
+            equipoSeleccionado.AgregarJugador(nuevoJugador);
+            
+            Console.WriteLine($"Jugador '{nombre} {apellido}' agregado al equipo '{equipoSeleccionado.Nombre}'");
+        }
+
+        static void VerJugadoresDeEquipo(Torneo torneo)
+        {
+            Console.WriteLine("\n-- JUGADORES DE UN EQUIPO --");
+            
+            if (torneo.Equipos.Count == 0)
+            {
+                Console.WriteLine("No hay equipos registrados en el torneo.");
+                return;
+            }
+            
+            Console.WriteLine("Equipos disponibles:");
+            for (int i = 0; i < torneo.Equipos.Count; i++)
+            {
+                Console.WriteLine($"{i+1}. {torneo.Equipos[i].Nombre}");
+            }
+            
+            Console.Write("Seleccione el número del equipo: ");
+            int indiceEquipo = int.Parse(Console.ReadLine()) - 1;
+            
+            if (indiceEquipo < 0 || indiceEquipo >= torneo.Equipos.Count)
+            {
+                Console.WriteLine("Selección inválida.");
+                return;
+            }
+            
+            Equipo equipoSeleccionado = torneo.Equipos[indiceEquipo];
+            
+            Console.WriteLine($"\nJugadores del equipo: {equipoSeleccionado.Nombre}");
+            
+            if (equipoSeleccionado.Jugadores.Count == 0)
+            {
+                Console.WriteLine("Este equipo no tiene jugadores registrados.");
+                return;
+            }
+            
+            foreach (var jugador in equipoSeleccionado.Jugadores)
+            {
+                Console.WriteLine(jugador);
+            }
+        }
+
+        static void VerDetallesDeTorneo(Torneo torneo)
+        {
+            Console.WriteLine("\n-- DETALLES DEL TORNEO --");
+            Console.WriteLine(torneo);
+            Console.WriteLine($"Total de equipos: {torneo.Equipos.Count}");
+            
+            int totalJugadores = 0;
+            foreach (var equipo in torneo.Equipos)
+            {
+                totalJugadores += equipo.Jugadores.Count;
+            }
+            
+            Console.WriteLine($"Total de jugadores: {totalJugadores}");
+        }
+    }
+}
