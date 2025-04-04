@@ -1,0 +1,290 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#define MAX_NODOS 10
+#define INFINITO 9999
+
+// Estructura para representar un grafo
+typedef struct {
+    char nombres[MAX_NODOS][50];  // Nombres de los nodos
+    int matriz[MAX_NODOS][MAX_NODOS];  // Matriz de adyacencia
+    int es_dirigido;  // 0 para no dirigido, 1 para dirigido
+    int num_nodos;    // Número de nodos en el grafo
+} Grafo;
+
+// Inicializar un grafo
+void inicializar_grafo(Grafo *g, int es_dirigido) {
+    g->es_dirigido = es_dirigido;
+    g->num_nodos = 0;
+    
+    // Inicializar matriz de adyacencia con 0
+    for (int i = 0; i < MAX_NODOS; i++) {
+        for (int j = 0; j < MAX_NODOS; j++) {
+            g->matriz[i][j] = 0;
+        }
+    }
+}
+
+// Agregar un nodo al grafo
+int agregar_nodo(Grafo *g, const char *nombre) {
+    if (g->num_nodos >= MAX_NODOS) {
+        printf("Error: El grafo ya tiene el máximo número de nodos.\n");
+        return -1;
+    }
+    
+    strcpy(g->nombres[g->num_nodos], nombre);
+    int indice = g->num_nodos;
+    g->num_nodos++;
+    return indice;
+}
+
+// Buscar el índice de un nodo por su nombre
+int buscar_nodo(Grafo *g, const char *nombre) {
+    for (int i = 0; i < g->num_nodos; i++) {
+        if (strcmp(g->nombres[i], nombre) == 0) {
+            return i;
+        }
+    }
+    return -1;  // No encontrado
+}
+
+// Agregar una arista entre dos nodos
+void agregar_arista(Grafo *g, const char *origen, const char *destino, int peso) {
+    int idx_origen = buscar_nodo(g, origen);
+    int idx_destino = buscar_nodo(g, destino);
+    
+    if (idx_origen == -1 || idx_destino == -1) {
+        printf("Error: Nodo no encontrado.\n");
+        return;
+    }
+    
+    g->matriz[idx_origen][idx_destino] = peso;
+    
+    // Si el grafo no es dirigido, también agregar la arista en sentido contrario
+    if (!g->es_dirigido) {
+        g->matriz[idx_destino][idx_origen] = peso;
+    }
+}
+
+// Imprimir representación ASCII del grafo
+void imprimir_grafo(Grafo *g) {
+    printf("\nRepresentación del grafo:\n");
+    printf("   ");
+    for (int i = 0; i < g->num_nodos; i++) {
+        printf("%-10s ", g->nombres[i]);
+    }
+    printf("\n");
+    
+    for (int i = 0; i < g->num_nodos; i++) {
+        printf("%-10s ", g->nombres[i]);
+        for (int j = 0; j < g->num_nodos; j++) {
+            if (g->matriz[i][j] == 0) {
+                printf("0         ");
+            } else {
+                printf("%-10d ", g->matriz[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+// Calcular centralidad de grado
+void calcular_centralidad_grado(Grafo *g) {
+    printf("\nCentralidad de grado:\n");
+    
+    for (int i = 0; i < g->num_nodos; i++) {
+        int grado = 0;
+        for (int j = 0; j < g->num_nodos; j++) {
+            if (g->matriz[i][j] > 0) {
+                grado++;
+            }
+        }
+        
+        float centralidad = (float)grado / (g->num_nodos - 1);
+        printf("%s: %d conexiones, centralidad = %.4f\n", g->nombres[i], grado, centralidad);
+    }
+}
+
+// Algoritmo de Dijkstra para encontrar caminos más cortos
+void dijkstra(Grafo *g, int origen, int distancias[]) {
+    int visitado[MAX_NODOS] = {0};
+    
+    // Inicializar todas las distancias como INFINITO
+    for (int i = 0; i < g->num_nodos; i++) {
+        distancias[i] = INFINITO;
+    }
+    
+    // La distancia del nodo origen a sí mismo es 0
+    distancias[origen] = 0;
+    
+    for (int count = 0; count < g->num_nodos - 1; count++) {
+        // Encontrar el vértice con la distancia mínima
+        int min = INFINITO, min_index;
+        
+        for (int v = 0; v < g->num_nodos; v++) {
+            if (visitado[v] == 0 && distancias[v] <= min) {
+                min = distancias[v];
+                min_index = v;
+            }
+        }
+        
+        // Marcar el vértice seleccionado como procesado
+        visitado[min_index] = 1;
+        
+        // Actualizar los valores de distancia de los vértices adyacentes
+        for (int v = 0; v < g->num_nodos; v++) {
+            if (!visitado[v] && g->matriz[min_index][v] && 
+                distancias[min_index] != INFINITO && 
+                distancias[min_index] + g->matriz[min_index][v] < distancias[v]) {
+                distancias[v] = distancias[min_index] + g->matriz[min_index][v];
+            }
+        }
+    }
+}
+
+// Calcular centralidad de cercanía
+void calcular_centralidad_cercania(Grafo *g) {
+    printf("\nCentralidad de cercanía:\n");
+    
+    for (int i = 0; i < g->num_nodos; i++) {
+        int distancias[MAX_NODOS];
+        dijkstra(g, i, distancias);
+        
+        int suma_distancias = 0;
+        for (int j = 0; j < g->num_nodos; j++) {
+            if (i != j && distancias[j] != INFINITO) {
+                suma_distancias += distancias[j];
+            }
+        }
+        
+        float centralidad = 0;
+        if (suma_distancias > 0) {
+            centralidad = (float)(g->num_nodos - 1) / suma_distancias;
+        }
+        
+        printf("%s: centralidad = %.4f\n", g->nombres[i], centralidad);
+    }
+}
+
+// Función para encontrar la ruta más barata entre dos nodos
+void ruta_mas_barata(Grafo *g, const char *origen, const char *destino) {
+    int idx_origen = buscar_nodo(g, origen);
+    int idx_destino = buscar_nodo(g, destino);
+    
+    if (idx_origen == -1 || idx_destino == -1) {
+        printf("Error: Nodo no encontrado.\n");
+        return;
+    }
+    
+    int distancias[MAX_NODOS];
+    dijkstra(g, idx_origen, distancias);
+    
+    if (distancias[idx_destino] == INFINITO) {
+        printf("No existe ruta de %s a %s\n", origen, destino);
+        return;
+    }
+    
+    printf("\nRuta más barata de %s a %s: Costo total = %d\n", 
+           origen, destino, distancias[idx_destino]);
+}
+
+int main() {
+    // Ejemplo 1: Red Social Simplificada
+    printf("=== EJEMPLO 1: RED SOCIAL SIMPLIFICADA ===\n");
+    Grafo red_social;
+    inicializar_grafo(&red_social, 0);  // Grafo no dirigido
+    
+    // Agregar nodos (personas)
+    agregar_nodo(&red_social, "Ana");
+    agregar_nodo(&red_social, "Carlos");
+    agregar_nodo(&red_social, "Maria");
+    agregar_nodo(&red_social, "Juan");
+    agregar_nodo(&red_social, "Elena");
+    agregar_nodo(&red_social, "Pedro");
+    agregar_nodo(&red_social, "Laura");
+    
+    // Agregar aristas (relaciones de amistad)
+    // En un grafo simple, usamos peso=1 para indicar conexión
+    agregar_arista(&red_social, "Ana", "Carlos", 1);
+    agregar_arista(&red_social, "Ana", "Maria", 1);
+    agregar_arista(&red_social, "Carlos", "Maria", 1);
+    agregar_arista(&red_social, "Carlos", "Juan", 1);
+    agregar_arista(&red_social, "Maria", "Elena", 1);
+    agregar_arista(&red_social, "Elena", "Pedro", 1);
+    agregar_arista(&red_social, "Pedro", "Laura", 1);
+    agregar_arista(&red_social, "Laura", "Ana", 1);
+    agregar_arista(&red_social, "Juan", "Pedro", 1);
+    
+    imprimir_grafo(&red_social);
+    calcular_centralidad_grado(&red_social);
+    calcular_centralidad_cercania(&red_social);
+    
+    // Ejemplo 2: Grafo de Tránsito Urbano
+    printf("\n=== EJEMPLO 2: GRAFO DE TRÁNSITO URBANO ===\n");
+    Grafo transito;
+    inicializar_grafo(&transito, 1);  // Grafo dirigido
+    
+    // Agregar nodos (intersecciones)
+    agregar_nodo(&transito, "Plaza");
+    agregar_nodo(&transito, "Mercado");
+    agregar_nodo(&transito, "Hospital");
+    agregar_nodo(&transito, "Univ");
+    agregar_nodo(&transito, "Parque");
+    agregar_nodo(&transito, "CComercial");
+    agregar_nodo(&transito, "Estacion");
+    
+    // Agregar aristas con pesos (tiempos de tránsito)
+    agregar_arista(&transito, "Plaza", "Mercado", 5);
+    agregar_arista(&transito, "Plaza", "Hospital", 8);
+    agregar_arista(&transito, "Mercado", "Univ", 10);
+    agregar_arista(&transito, "Hospital", "Univ", 6);
+    agregar_arista(&transito, "Univ", "Parque", 4);
+    agregar_arista(&transito, "Parque", "CComercial", 7);
+    agregar_arista(&transito, "CComercial", "Estacion", 3);
+    agregar_arista(&transito, "Estacion", "Plaza", 12);
+    agregar_arista(&transito, "Mercado", "Parque", 9);
+    agregar_arista(&transito, "Hospital", "CComercial", 11);
+    
+    imprimir_grafo(&transito);
+    
+    // Ejemplo 3: Red de Vuelos
+    printf("\n=== EJEMPLO 3: RED DE VUELOS EUROPEOS ===\n");
+    Grafo vuelos;
+    inicializar_grafo(&vuelos, 1);  // Grafo dirigido
+    
+    // Agregar ciudades
+    agregar_nodo(&vuelos, "Madrid");
+    agregar_nodo(&vuelos, "Barcelona");
+    agregar_nodo(&vuelos, "Lisboa");
+    agregar_nodo(&vuelos, "Paris");
+    agregar_nodo(&vuelos, "Roma");
+    agregar_nodo(&vuelos, "Londres");
+    
+    // Agregar vuelos con precios
+    agregar_arista(&vuelos, "Madrid", "Barcelona", 90);
+    agregar_arista(&vuelos, "Madrid", "Lisboa", 110);
+    agregar_arista(&vuelos, "Madrid", "Paris", 150);
+    agregar_arista(&vuelos, "Barcelona", "Roma", 120);
+    agregar_arista(&vuelos, "Barcelona", "Paris", 100);
+    agregar_arista(&vuelos, "Lisboa", "Londres", 170);
+    agregar_arista(&vuelos, "Paris", "Londres", 130);
+    agregar_arista(&vuelos, "Roma", "Madrid", 160);
+    
+    imprimir_grafo(&vuelos);
+    
+    // Buscar rutas baratas
+    ruta_mas_barata(&vuelos, "Madrid", "Londres");
+    ruta_mas_barata(&vuelos, "Barcelona", "Londres");
+    ruta_mas_barata(&vuelos, "Lisboa", "Roma");
+    
+    printf("\n=== CONCLUSIONES PERSONALIZADAS ===\n");
+    printf("1. La implementación en C requiere estructuras de datos explícitas\n");
+    printf("2. La centralidad de grado identifica a los nodos más conectados\n");
+    printf("3. El algoritmo de Dijkstra es útil para encontrar rutas óptimas\n");
+    printf("4. La visualización en consola es limitada pero funcional\n");
+    printf("5. La teoría de grafos tiene aplicaciones prácticas en diversos campos\n");
+    
+    return 0;
+}
